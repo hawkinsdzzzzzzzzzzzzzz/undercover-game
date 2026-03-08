@@ -16,10 +16,11 @@ function broadcastSidebar(roomCode) {
     const room = games[roomCode];
     if (!room) return;
     const sidebarData = room.players.map(p => ({
-        id: p.id,
+        userId: p.userId,
         name: p.name,
         score: p.score,
-        hasVoted: !!room.votes[p.id]
+        hasVoted: !!room.votes[p.userId],
+        connected: p.connected
     }));
     io.to(roomCode).emit('updateSidebar', sidebarData);
 }
@@ -32,37 +33,80 @@ function processResults(roomCode) {
     const civil = room.players.find(p => p.role === 'Civil');
 
     const roundScores = {};
-    room.players.forEach(p => roundScores[p.id] = 0);
+    room.players.forEach(p => roundScores[p.userId] = 0);
 
     const voteRecap = [];
 
     for (const [voterId, votedId] of Object.entries(room.votes)) {
-        const voter = room.players.find(p => p.id === voterId);
-        const voted = room.players.find(p => p.id === votedId);
+        const voter = room.players.find(p => p.userId === voterId);
+        const voted = room.players.find(p => p.userId === votedId);
 
         voteRecap.push({ voterName: voter.name, votedName: voted ? voted.name : "Personne" });
 
-        if (voterId === undercover.id) continue;
+        if (voterId === undercover.userId) continue;
 
-        if (votedId === undercover.id) {
+        if (votedId === undercover.userId) {
             roundScores[voterId] += 10;
             voter.score += 10;
         } else {
-            roundScores[undercover.id] += 10;
+            roundScores[undercover.userId] += 10;
             undercover.score += 10;
         }
     }
 
-    io.to(roomCode).emit('resultsRevealed', {
+    room.lastResults = {
         undercoverName: undercover.name,
         undercoverWord: undercover.word,
         civilWord: civil ? civil.word : "Inconnu",
         voteRecap: voteRecap,
         roundScores: roundScores,
         players: room.players
-    });
+    };
 
+    io.to(roomCode).emit('resultsRevealed', room.lastResults);
     broadcastSidebar(roomCode);
+}
+
+// Gère la soumission d'un mot (manuel ou forcé par le timer)
+function handleClueSubmission(roomCode, expectedUserId, clueText) {
+    const room = games[roomCode];
+    if (!room || room.state !== 'playing') return;
+
+    const expectedPlayer = room.turnOrder[room.currentTurnIndex];
+    if (expectedPlayer.userId !== expectedUserId) return;
+
+    // On efface le timer pour ne pas qu'il s'active en double
+    clearTimeout(room.turnTimer);
+
+    room.clues.push({ playerName: expectedPlayer.name, word: clueText });
+    room.currentTurnIndex++;
+
+    if (room.currentTurnIndex >= room.turnOrder.length) {
+        room.currentTurnIndex = 0;
+        room.currentCycle++;
+    }
+
+    if (room.currentCycle > room.settings.wordsPerPerson) {
+        room.state = 'waiting_for_vote';
+        io.to(roomCode).emit('endOfRounds', room.clues);
+        broadcastSidebar(roomCode);
+    } else {
+        const nextPlayer = room.turnOrder[room.currentTurnIndex];
+        room.turnEndTime = Date.now() + 30000; // 30 secondes
+
+        // On lance le timer pour le prochain joueur
+        room.turnTimer = setTimeout(() => {
+            handleClueSubmission(roomCode, nextPlayer.userId, "⏳ TROP LENT");
+        }, 30000);
+
+        io.to(roomCode).emit('nextTurn', {
+            clues: room.clues,
+            currentPlayerId: nextPlayer.userId,
+            currentPlayerName: nextPlayer.name,
+            currentCycle: room.currentCycle,
+            turnEndTime: room.turnEndTime
+        });
+    }
 }
 
 function startNewRound(roomCode) {
@@ -72,21 +116,14 @@ function startNewRound(roomCode) {
     room.currentCycle = 1;
     room.clues = [];
     room.votes = {};
+    clearTimeout(room.turnTimer);
 
-    // --- SÉLECTION DU THÈME ---
     let pool = [];
-    if (room.settings.theme === 'Anime') {
-        pool = wordPairsDatabase['Anime'];
-    } else if (room.settings.theme === 'Classique') {
-        pool = wordPairsDatabase['Classique'];
-    } else {
-        // Thème Mixte (On mélange les deux)
-        pool = [...wordPairsDatabase['Classique'], ...wordPairsDatabase['Anime']];
-    }
+    if (room.settings.theme === 'Anime') pool = wordPairsDatabase['Anime'];
+    else if (room.settings.theme === 'Classique') pool = wordPairsDatabase['Classique'];
+    else pool = [...wordPairsDatabase['Classique'], ...wordPairsDatabase['Anime']];
 
-    // --- SYSTÈME ANTI-DOUBLON ---
     let availableWords = pool.filter(pair => !room.usedWords.includes(pair.civil));
-
     if (availableWords.length === 0) {
         room.usedWords = [];
         availableWords = pool;
@@ -95,11 +132,8 @@ function startNewRound(roomCode) {
     const randomIndex = Math.floor(Math.random() * availableWords.length);
     const randomPair = availableWords[randomIndex];
 
-    // On mémorise le mot pour ne pas le revoir tout de suite
     room.usedWords.push(randomPair.civil);
-    if (room.usedWords.length > 20) {
-        room.usedWords.shift();
-    }
+    if (room.usedWords.length > 20) room.usedWords.shift();
 
     const undercoverIndex = Math.floor(Math.random() * room.players.length);
     room.turnOrder = [...room.players].sort(() => Math.random() - 0.5);
@@ -113,31 +147,61 @@ function startNewRound(roomCode) {
             player.word = randomPair.civil;
         }
 
-        io.to(player.id).emit('gameStarted', {
+        io.to(player.socketId).emit('gameStarted', {
             word: player.word,
             turnOrder: room.turnOrder.map(p => p.name),
-            currentPlayerId: room.turnOrder[0].id,
+            currentPlayerId: room.turnOrder[0].userId,
             currentPlayerName: room.turnOrder[0].name,
             currentRound: room.currentRound,
             totalRounds: room.settings.totalRounds,
-            wordsPerPerson: room.settings.wordsPerPerson
+            wordsPerPerson: room.settings.wordsPerPerson,
+            turnEndTime: Date.now() + 30000 // Fin du premier tour dans 30s
         });
     });
+
+    // Lancer le timer pour le 1er joueur
+    room.turnTimer = setTimeout(() => {
+        handleClueSubmission(roomCode, room.turnOrder[0].userId, "⏳ TROP LENT");
+    }, 30000);
 
     broadcastSidebar(roomCode);
 }
 
 io.on('connection', (socket) => {
+
+    // --- RECONNEXION AUTOMATIQUE ---
+    socket.on('reconnectUser', (data) => {
+        const room = games[data.roomCode];
+        if (room) {
+            const player = room.players.find(p => p.userId === data.userId);
+            if (player) {
+                player.socketId = socket.id;
+                player.connected = true;
+                socket.join(data.roomCode);
+
+                socket.emit('reconnectSuccess', {
+                    roomCode: data.roomCode,
+                    room: room,
+                    myUserId: data.userId
+                });
+                broadcastSidebar(data.roomCode);
+                return;
+            }
+        }
+        socket.emit('reconnectFailed');
+    });
+
     socket.on('createRoom', (data) => {
         const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
 
         games[roomCode] = {
-            players: [{ id: socket.id, name: data.playerName, role: null, word: null, score: 0 }],
+            code: roomCode,
+            players: [{ userId: data.userId, socketId: socket.id, name: data.playerName, role: null, word: null, score: 0, connected: true }],
             state: 'waiting',
             settings: {
                 wordsPerPerson: parseInt(data.wordsPerPerson) || 2,
                 totalRounds: parseInt(data.totalRounds) || 1,
-                theme: data.theme || 'Mixte' // On enregistre le thème !
+                theme: data.theme || 'Mixte'
             },
             currentRound: 1,
             turnOrder: [],
@@ -155,11 +219,13 @@ io.on('connection', (socket) => {
 
     socket.on('joinRoom', (data) => {
         const roomCode = data.code;
-        const playerName = data.playerName;
         const room = games[roomCode];
 
         if (room && room.state === 'waiting') {
-            room.players.push({ id: socket.id, name: playerName, role: null, word: null, score: 0 });
+            const existing = room.players.find(p => p.userId === data.userId);
+            if (!existing) {
+                room.players.push({ userId: data.userId, socketId: socket.id, name: data.playerName, role: null, word: null, score: 0, connected: true });
+            }
             socket.join(roomCode);
             socket.emit('roomJoined', roomCode);
             broadcastSidebar(roomCode);
@@ -168,76 +234,66 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('startGame', (roomCode) => {
-        const room = games[roomCode];
-        if (room && room.state === 'waiting' && room.players[0].id === socket.id) {
+    // QUITTER LE SALON DÉFINITIVEMENT
+    socket.on('leaveRoom', (data) => {
+        const room = games[data.roomCode];
+        if (room) {
+            const playerIndex = room.players.findIndex(p => p.userId === data.userId);
+            if (playerIndex !== -1) {
+                room.players.splice(playerIndex, 1);
+                socket.leave(data.roomCode);
+                broadcastSidebar(data.roomCode);
+                if (room.players.length === 0) delete games[data.roomCode];
+            }
+        }
+    });
+
+    socket.on('startGame', (data) => {
+        const room = games[data.roomCode];
+        if (room && room.state === 'waiting' && room.players[0].userId === data.userId) {
             if (room.players.length < 3) return socket.emit('error', "3 joueurs minimum requis.");
-            startNewRound(roomCode);
+            startNewRound(data.roomCode);
         }
     });
 
     socket.on('submitClue', (data) => {
-        const room = games[data.roomCode];
-        if (!room || room.state !== 'playing') return;
-
-        const expectedPlayer = room.turnOrder[room.currentTurnIndex];
-        if (socket.id !== expectedPlayer.id) return;
-
-        room.clues.push({ playerName: expectedPlayer.name, word: data.clue });
-        room.currentTurnIndex++;
-
-        if (room.currentTurnIndex >= room.turnOrder.length) {
-            room.currentTurnIndex = 0;
-            room.currentCycle++;
-        }
-
-        if (room.currentCycle > room.settings.wordsPerPerson) {
-            room.state = 'waiting_for_vote';
-            io.to(data.roomCode).emit('endOfRounds', room.clues);
-            broadcastSidebar(data.roomCode);
-        } else {
-            const nextPlayer = room.turnOrder[room.currentTurnIndex];
-            io.to(data.roomCode).emit('nextTurn', {
-                clues: room.clues,
-                currentPlayerId: nextPlayer.id,
-                currentPlayerName: nextPlayer.name,
-                currentCycle: room.currentCycle
-            });
-        }
+        handleClueSubmission(data.roomCode, data.userId, data.clue);
     });
 
-    socket.on('hostStartVote', (roomCode) => {
-        const room = games[roomCode];
-        if (room && room.state === 'waiting_for_vote' && room.players[0].id === socket.id) {
+    socket.on('hostStartVote', (data) => {
+        const room = games[data.roomCode];
+        if (room && room.state === 'waiting_for_vote' && room.players[0].userId === data.userId) {
             room.state = 'voting';
-            const playersToVoteFor = room.players.map(p => ({ id: p.id, name: p.name }));
-            io.to(roomCode).emit('votePhase', { players: playersToVoteFor, clues: room.clues });
-            broadcastSidebar(roomCode);
+            const playersToVoteFor = room.players.map(p => ({ userId: p.userId, name: p.name }));
+            io.to(data.roomCode).emit('votePhase', { players: playersToVoteFor, clues: room.clues });
+            broadcastSidebar(data.roomCode);
         }
     });
 
     socket.on('submitVote', (data) => {
         const room = games[data.roomCode];
-        if (room && room.state === 'voting' && !room.votes[socket.id]) {
-            room.votes[socket.id] = data.votedId;
+        if (room && room.state === 'voting' && !room.votes[data.userId]) {
+            room.votes[data.userId] = data.votedId;
             broadcastSidebar(data.roomCode);
 
-            const votesCount = Object.keys(room.votes).length;
+            // Vérifier si tous les joueurs CONNECTÉS ont voté
+            const connectedPlayers = room.players.filter(p => p.connected);
+            const allVoted = connectedPlayers.every(p => room.votes[p.userId] !== undefined);
 
-            if (votesCount === room.players.length) {
+            if (allVoted && connectedPlayers.length > 0) {
                 processResults(data.roomCode);
             }
         }
     });
 
-    socket.on('nextRound', (roomCode) => {
-        const room = games[roomCode];
-        if (room && room.players[0].id === socket.id) {
+    socket.on('nextRound', (data) => {
+        const room = games[data.roomCode];
+        if (room && room.players[0].userId === data.userId) {
             room.currentRound++;
             if (room.currentRound > room.settings.totalRounds) {
-                io.to(roomCode).emit('gameOver', room.players);
+                io.to(data.roomCode).emit('gameOver');
             } else {
-                startNewRound(roomCode);
+                startNewRound(data.roomCode);
             }
         }
     });
@@ -245,19 +301,18 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         for (const code in games) {
             const room = games[code];
-            const playerIndex = room.players.findIndex(p => p.id === socket.id);
-            if (playerIndex !== -1) {
-                room.players.splice(playerIndex, 1);
+            const player = room.players.find(p => p.socketId === socket.id);
+            if (player) {
+                player.connected = false;
                 broadcastSidebar(code);
 
                 if (room.state === 'voting') {
-                    const votesCount = Object.keys(room.votes).length;
-                    if (votesCount === room.players.length && room.players.length > 0) {
+                    const connectedPlayers = room.players.filter(p => p.connected);
+                    const allVoted = connectedPlayers.every(p => room.votes[p.userId] !== undefined);
+                    if (allVoted && connectedPlayers.length > 0) {
                         processResults(code);
                     }
                 }
-
-                if (room.players.length === 0) delete games[code];
                 break;
             }
         }
@@ -266,21 +321,3 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Serveur en ligne : http://localhost:${PORT}`));
-
-// --- BOT ANTI-SOMMEIL POUR RENDER ---
-const https = require('https');
-
-// Le bot s'exécute toutes les 14 minutes (14 * 60 * 1000 millisecondes)
-setInterval(() => {
-    // Remplacer par l'URL finale que Render va te donner (ex: https://mon-jeu-undercover.onrender.com)
-    const url = 'https://TON-APP.onrender.com';
-
-    // On évite de faire le ping si l'URL n'est pas encore configurée
-    if (url.includes('TON-APP')) return;
-
-    https.get(url, (res) => {
-        console.log(`[Bot] Ping effectué - Le site reste éveillé (Statut: ${res.statusCode})`);
-    }).on('error', (e) => {
-        console.error(`[Bot] Erreur lors du ping : ${e.message}`);
-    });
-}, 14 * 60 * 1000);

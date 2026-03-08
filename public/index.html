@@ -16,6 +16,7 @@
             --primary: #818cf8;
             --primary-hover: #6366f1;
             --success: #10b981;
+            --warning: #f59e0b;
             --danger: #f43f5e;
             --border: rgba(45, 49, 66, 0.8);
         }
@@ -74,7 +75,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
         }
 
@@ -99,18 +100,21 @@
             }
         }
 
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
         h1 {
             font-size: 2.2em;
             font-weight: 700;
-            margin: 0 0 25px 0;
             text-align: center;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         h2 {
             font-size: 1.4em;
-            font-weight: 600;
-            margin-top: 0;
             border-bottom: 1px solid var(--border);
             padding-bottom: 10px;
         }
@@ -120,7 +124,6 @@
             font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 0;
         }
 
         input[type="text"],
@@ -135,10 +138,8 @@
             border-radius: 10px;
             font-weight: 600;
             font-size: 15px;
-            transition: all 0.3s ease;
             margin-bottom: 15px;
             text-transform: uppercase;
-            cursor: pointer;
         }
 
         input::placeholder {
@@ -151,14 +152,11 @@
         select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(129, 140, 248, 0.15);
-            transform: translateY(-1px);
         }
 
         .settings-row {
             display: flex;
             gap: 10px;
-            margin-top: 5px;
         }
 
         .settings-row div {
@@ -180,20 +178,17 @@
             font-weight: 600;
             border: none;
             border-radius: 10px;
-            font-family: 'Inter', sans-serif;
             transition: all 0.3s ease;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 15px rgba(129, 140, 248, 0.2);
         }
 
         .btn-primary:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(129, 140, 248, 0.3);
         }
 
         .btn-secondary {
@@ -210,13 +205,21 @@
         .btn-success {
             background: var(--success);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
 
         .btn-success:hover {
             background: #059669;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(244, 63, 94, 0.2);
         }
 
         .menu-block {
@@ -224,9 +227,10 @@
             padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border);
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
+        /* --- SIDEBAR JOUEURS --- */
         .player-card {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -235,7 +239,6 @@
             margin-bottom: 10px;
             display: flex;
             flex-direction: column;
-            transition: 0.2s;
         }
 
         .player-card-header {
@@ -272,9 +275,37 @@
         .status-voted {
             background: rgba(16, 185, 129, 0.15);
             color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
+        .status-offline {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        /* --- TIMER --- */
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        .timer-danger {
+            background: var(--danger) !important;
+        }
+
+        /* --- JEU --- */
         .clues-container {
             display: flex;
             flex-wrap: wrap;
@@ -324,7 +355,6 @@
             border-radius: 12px;
             margin-top: 20px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(129, 140, 248, 0.1);
         }
 
         .secret-text {
@@ -335,9 +365,9 @@
             text-align: center;
             letter-spacing: 1px;
             text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
         }
 
+        /* --- VOTES --- */
         .vote-btn {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -348,18 +378,15 @@
             display: flex;
             align-items: flex-start;
             gap: 15px;
-            transition: all 0.2s;
         }
 
         .vote-btn:hover {
             border-color: var(--primary);
-            transform: translateX(5px);
         }
 
         .vote-btn.selected {
             background: rgba(129, 140, 248, 0.15);
             border-color: var(--primary);
-            box-shadow: inset 0 0 15px rgba(129, 140, 248, 0.1);
         }
 
         #custom-modal-overlay {
@@ -384,7 +411,6 @@
             width: 90%;
             text-align: center;
             border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         @keyframes popIn {
@@ -417,57 +443,63 @@
         <div class="sidebar" id="sidebar" style="display: none;">
             <h2 style="font-size: 1.2em; border:none; margin-bottom: 15px;">Joueurs</h2>
             <div id="sidebar-players"></div>
+            <button onclick="leaveRoom()" class="btn-danger"
+                style="margin-top: 20px; font-size: 0.9em; padding: 10px;">🚪 Quitter le salon</button>
         </div>
 
         <div class="main-content">
 
             <div id="menu" class="fade-in-up">
-                <h1>UNDERCOVER</h1>
+                <h1 style="margin-bottom: 5px;">UNDERCOVER</h1>
+                <p id="reconnect-msg"
+                    style="color: var(--primary); font-weight: bold; text-align: center; display: none;">Tentative de
+                    reconnexion...</p>
 
-                <div style="margin-bottom: 30px;">
-                    <label
-                        style="display: block; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-align: left;">Ton
-                        Pseudo :</label>
-                    <input type="text" id="globalPlayerName" placeholder="ENTRE TON PSEUDO..." required
-                        oninput="this.value = this.value.toUpperCase()">
-                </div>
-
-                <div class="menu-block" style="margin-bottom: 20px;">
-                    <h3>Créer un salon</h3>
-
-                    <div style="margin-top: 5px;">
+                <div id="menu-content">
+                    <div style="margin-bottom: 30px; margin-top: 20px;">
                         <label
-                            style="display: block; font-size: 0.8em; color: var(--text-muted); margin-bottom: 5px;">Thème
-                            de la partie</label>
-                        <select id="gameTheme">
-                            <option value="Mixte">Mixte (Classique + Anime)</option>
-                            <option value="Classique">Classique Uniquement</option>
-                            <option value="Anime">100% Animé Uniquement</option>
-                        </select>
+                            style="display: block; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">Ton
+                            Pseudo :</label>
+                        <input type="text" id="globalPlayerName" placeholder="ENTRE TON PSEUDO..." required
+                            oninput="this.value = this.value.toUpperCase()"
+                            onkeydown="if(event.key === 'Enter') document.getElementById('roomCodeInput').focus()">
                     </div>
 
-                    <div class="settings-row">
-                        <div><label>Mots / Joueur</label><input type="number" id="wordsPerPerson" value="2" min="1"
-                                max="5"></div>
-                        <div><label>Manches</label><input type="number" id="totalRounds" value="1" min="1" max="10">
+                    <div class="menu-block">
+                        <h3>Créer un salon</h3>
+                        <div style="margin-top: 5px; margin-bottom: 15px;">
+                            <label
+                                style="display: block; font-size: 0.8em; color: var(--text-muted); margin-bottom: 5px;">Thème</label>
+                            <select id="gameTheme">
+                                <option value="Mixte">Mixte (Classique + Anime)</option>
+                                <option value="Classique">Classique Uniquement</option>
+                                <option value="Anime">100% Animé Uniquement</option>
+                            </select>
                         </div>
+                        <div class="settings-row">
+                            <div><label>Mots / Joueur</label><input type="number" id="wordsPerPerson" value="2" min="1"
+                                    max="5" onkeydown="if(event.key === 'Enter') createRoom()"></div>
+                            <div><label>Manches</label><input type="number" id="totalRounds" value="1" min="1" max="10"
+                                    onkeydown="if(event.key === 'Enter') createRoom()"></div>
+                        </div>
+                        <button onclick="createRoom()" class="btn-primary" style="margin-top: 10px;">Créer la
+                            partie</button>
                     </div>
-                    <button onclick="createRoom()" class="btn-primary" style="margin-top: 10px;">Créer la
-                        partie</button>
-                </div>
 
-                <div class="menu-block">
-                    <h3>Rejoindre un salon</h3>
-                    <input type="text" id="roomCodeInput" placeholder="CODE (EX: A4X9)" maxlength="4"
-                        style="text-align: center; font-weight: bold; letter-spacing: 3px;"
-                        oninput="this.value = this.value.toUpperCase()">
-                    <button onclick="joinRoom()" class="btn-secondary">Rejoindre</button>
+                    <div class="menu-block" style="margin-bottom:0;">
+                        <h3>Rejoindre un salon</h3>
+                        <input type="text" id="roomCodeInput" placeholder="CODE (EX: A4X9)" maxlength="4"
+                            style="text-align: center; font-weight: bold; letter-spacing: 3px;"
+                            oninput="this.value = this.value.toUpperCase()"
+                            onkeydown="if(event.key === 'Enter') joinRoom()">
+                        <button onclick="joinRoom()" class="btn-secondary">Rejoindre</button>
+                    </div>
                 </div>
             </div>
 
             <div id="game-info" style="display: none;">
                 <h3 style="text-align: center;">Code du salon</h3>
-                <h1 style="color: var(--primary); font-size: 3.5em; letter-spacing: 8px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(129, 140, 248, 0.4);"
+                <h1 style="color: var(--primary); font-size: 3.5em; letter-spacing: 8px; margin-bottom: 10px;"
                     id="room-display"></h1>
                 <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Partagez ce code avec vos
                     amis.</p>
@@ -489,10 +521,15 @@
                     style="font-size: 1.05em; font-weight: 500; text-align: center; color: var(--text-muted); margin-top: 10px;">
                 </div>
 
+                <div class="timer-container" id="timer-container">
+                    <div class="timer-fill" id="timer-fill"></div>
+                </div>
+
                 <div id="clue-action" style="display: none;" class="my-turn">
                     <h3 style="margin-top: 0; color: var(--primary);">À ton tour d'écrire !</h3>
                     <input type="text" id="clue-input" placeholder="SAISIS TON MOT ICI..." maxlength="20"
-                        oninput="this.value = this.value.toUpperCase()">
+                        oninput="this.value = this.value.toUpperCase()"
+                        onkeydown="if(event.key === 'Enter') submitClue()">
                     <button onclick="submitClue()" class="btn-primary">Envoyer l'indice</button>
                 </div>
 
@@ -507,11 +544,8 @@
 
             <div id="vote-board" style="display: none;">
                 <h2>Phase de vote</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">Sélectionnez l'Undercover selon ses mots. Le
-                    résultat s'affichera dès que tout le monde aura voté.</p>
-
+                <p style="color: var(--text-muted); margin-bottom: 25px;">Sélectionnez l'Undercover selon ses mots.</p>
                 <div id="vote-options"></div>
-
                 <button id="confirm-vote-btn" onclick="confirmVote()" class="btn-primary"
                     style="display: none; margin-top: 20px;">Confirmer mon vote</button>
                 <p id="vote-status-msg"
@@ -520,12 +554,11 @@
 
             <div id="results-board" style="display: none;">
                 <h2 style="text-align: center; border:none;">Résultats</h2>
-
                 <div
-                    style="text-align: center; margin: 10px 0 30px 0; padding: 25px; background: rgba(244, 63, 94, 0.05); border-radius: 16px; border: 1px solid rgba(244, 63, 94, 0.2); box-shadow: inset 0 0 20px rgba(244, 63, 94, 0.05);">
+                    style="text-align: center; margin: 10px 0 30px 0; padding: 25px; background: rgba(244, 63, 94, 0.05); border-radius: 16px; border: 1px solid rgba(244, 63, 94, 0.2);">
                     <h3 style="margin-bottom: 10px;">L'Undercover était</h3>
                     <div id="undercover-reveal"
-                        style="color: var(--danger); font-size: 2.2em; font-weight: 800; text-transform: uppercase; text-shadow: 0 0 15px rgba(244, 63, 94, 0.4);">
+                        style="color: var(--danger); font-size: 2.2em; font-weight: 800; text-transform: uppercase;">
                     </div>
 
                     <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
@@ -550,22 +583,38 @@
 
                 <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px;">Récapitulatif des votes</h3>
                 <ul id="vote-recap-list" style="margin-top: 15px;"></ul>
-
                 <button id="next-round-btn" onclick="nextRound()" class="btn-primary"
                     style="display: none; margin-top: 30px;">Lancer la manche suivante</button>
             </div>
-
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let currentRoomCode = "";
         let amIHost = false;
         let selectedVoteId = null;
         let currentGameState = 'waiting';
         let currentTurnOrder = [];
+        let timerInterval;
+
+        let localUserId = localStorage.getItem('uc_uid');
+        if (!localUserId) {
+            localUserId = Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('uc_uid', localUserId);
+        }
+        let savedRoomCode = localStorage.getItem('uc_room');
+
+        socket.on('connect', () => {
+            if (savedRoomCode) {
+                document.getElementById('menu-content').style.display = 'none';
+                document.getElementById('reconnect-msg').style.display = 'block';
+                socket.emit('reconnectUser', { roomCode: savedRoomCode, userId: localUserId });
+            } else {
+                const savedName = localStorage.getItem('uc_name');
+                if (savedName) document.getElementById('globalPlayerName').value = savedName;
+            }
+        });
 
         function showBoard(boardId) {
             ['menu', 'game-info', 'game-board', 'vote-board', 'results-board'].forEach(id => {
@@ -586,37 +635,76 @@
         }
         function closeModal() { document.getElementById('custom-modal-overlay').style.display = 'none'; }
 
+        function startLocalTimer(endTime) {
+            clearInterval(timerInterval);
+            const container = document.getElementById('timer-container');
+            const fill = document.getElementById('timer-fill');
+            container.style.display = 'block';
+            fill.style.width = '100%';
+            fill.classList.remove('timer-danger');
+
+            timerInterval = setInterval(() => {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    fill.style.width = '0%';
+                } else {
+                    const percent = (remaining / 30000) * 100;
+                    fill.style.width = percent + '%';
+                    if (percent < 25) fill.classList.add('timer-danger');
+                    else fill.classList.remove('timer-danger');
+                }
+            }, 100);
+        }
+
+        function stopLocalTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer-container').style.display = 'none';
+        }
+
         function createRoom() {
             const name = document.getElementById('globalPlayerName').value.trim();
             if (!name) return showModal("Action requise", "Veuillez choisir un pseudo.");
+
+            localStorage.setItem('uc_name', name);
             amIHost = true;
             socket.emit('createRoom', {
-                playerName: name,
+                userId: localUserId, playerName: name,
                 wordsPerPerson: document.getElementById('wordsPerPerson').value,
                 totalRounds: document.getElementById('totalRounds').value,
-                theme: document.getElementById('gameTheme').value // Envoi du thème
+                theme: document.getElementById('gameTheme').value
             });
-            document.getElementById('start-btn').style.display = 'block';
         }
 
         function joinRoom() {
             const name = document.getElementById('globalPlayerName').value.trim();
             const code = document.getElementById('roomCodeInput').value.trim();
             if (!name || !code) return showModal("Action requise", "Veuillez remplir votre pseudo et le code.");
+
+            localStorage.setItem('uc_name', name);
             amIHost = false;
-            socket.emit('joinRoom', { code: code, playerName: name });
+            socket.emit('joinRoom', { code: code, userId: localUserId, playerName: name });
         }
 
-        function startGame() { socket.emit('startGame', currentRoomCode); }
-        function nextRound() { socket.emit('nextRound', currentRoomCode); }
-        function goToVote() { socket.emit('hostStartVote', currentRoomCode); }
+        function leaveRoom() {
+            if (confirm("Veux-tu vraiment quitter le salon ?")) {
+                socket.emit('leaveRoom', { roomCode: savedRoomCode, userId: localUserId });
+                localStorage.removeItem('uc_room');
+                location.reload();
+            }
+        }
+
+        function startGame() { socket.emit('startGame', { roomCode: savedRoomCode, userId: localUserId }); }
+        function nextRound() { socket.emit('nextRound', { roomCode: savedRoomCode, userId: localUserId }); }
+        function goToVote() { socket.emit('hostStartVote', { roomCode: savedRoomCode, userId: localUserId }); }
 
         function submitClue() {
             const clue = document.getElementById('clue-input').value.trim();
             if (!clue) return showModal("Attention", "Ton mot ne peut pas être vide.");
-            socket.emit('submitClue', { roomCode: currentRoomCode, clue: clue });
+            socket.emit('submitClue', { roomCode: savedRoomCode, userId: localUserId, clue: clue });
             document.getElementById('clue-input').value = "";
             document.getElementById('clue-action').style.display = 'none';
+            stopLocalTimer();
         }
 
         function selectVote(playerId, buttonElement) {
@@ -628,7 +716,7 @@
 
         function confirmVote() {
             if (!selectedVoteId) return;
-            socket.emit('submitVote', { roomCode: currentRoomCode, votedId: selectedVoteId });
+            socket.emit('submitVote', { roomCode: savedRoomCode, userId: localUserId, votedId: selectedVoteId });
             document.getElementById('vote-options').style.display = 'none';
             document.getElementById('confirm-vote-btn').style.display = 'none';
             document.getElementById('vote-status-msg').innerText = "Vote enregistré. En attente des autres...";
@@ -637,24 +725,20 @@
         function renderCluesGrid(clues) {
             const container = document.getElementById('clues-container');
             container.innerHTML = '';
-
             currentTurnOrder.forEach(playerName => {
                 const col = document.createElement('div');
                 col.className = 'player-column';
-
                 const header = document.createElement('div');
                 header.className = 'player-column-header';
                 header.innerText = playerName;
                 col.appendChild(header);
 
-                const playerClues = clues.filter(c => c.playerName === playerName);
-                playerClues.forEach(c => {
+                clues.filter(c => c.playerName === playerName).forEach(c => {
                     const wordDiv = document.createElement('div');
                     wordDiv.className = 'player-column-word';
                     wordDiv.innerText = c.word;
                     col.appendChild(wordDiv);
                 });
-
                 container.appendChild(col);
             });
         }
@@ -663,14 +747,17 @@
             const sidebar = document.getElementById('sidebar-players');
             sidebar.innerHTML = '';
 
+            if (currentGameState === 'waiting' && amIHost) {
+                document.getElementById('start-btn').style.display = 'block';
+            }
+
             players.forEach(p => {
                 let statusHtml = '';
-                if (currentGameState === 'voting') {
-                    if (p.hasVoted) {
-                        statusHtml = `<div class="player-status status-voted">A voté ✅</div>`;
-                    } else {
-                        statusHtml = `<div class="player-status status-waiting">En réflexion...</div>`;
-                    }
+                if (!p.connected) {
+                    statusHtml = `<div class="player-status status-offline">Déconnecté 🔴</div>`;
+                } else if (currentGameState === 'voting') {
+                    if (p.hasVoted) statusHtml = `<div class="player-status status-voted">A voté ✅</div>`;
+                    else statusHtml = `<div class="player-status status-waiting">Réfléchit...</div>`;
                 }
 
                 sidebar.innerHTML += `
@@ -685,73 +772,72 @@
             });
         });
 
-        socket.on('error', (msg) => showModal("Erreur", msg));
+        socket.on('error', (msg) => {
+            showModal("Erreur", msg);
+            document.getElementById('reconnect-msg').style.display = 'none';
+            document.getElementById('menu-content').style.display = 'block';
+            localStorage.removeItem('uc_room');
+        });
 
         socket.on('roomCreated', (code) => {
-            currentRoomCode = code;
+            savedRoomCode = code; localStorage.setItem('uc_room', code);
             document.getElementById('room-display').innerText = code;
-            currentGameState = 'waiting';
-            showBoard('game-info');
+            currentGameState = 'waiting'; showBoard('game-info');
         });
 
         socket.on('roomJoined', (code) => {
-            currentRoomCode = code;
+            savedRoomCode = code; localStorage.setItem('uc_room', code);
             document.getElementById('room-display').innerText = code;
-            currentGameState = 'waiting';
-            showBoard('game-info');
+            currentGameState = 'waiting'; showBoard('game-info');
         });
 
         socket.on('gameStarted', (data) => {
             currentGameState = 'playing';
             currentTurnOrder = data.turnOrder;
-
             document.getElementById('round-display').innerText = `Manche ${data.currentRound}/${data.totalRounds}`;
             document.getElementById('secret-word').innerText = data.word;
             document.getElementById('go-to-vote-btn').style.display = 'none';
 
-            renderCluesGrid([]);
-            showBoard('game-board');
-            handleTurn(data.currentPlayerId, data.currentPlayerName);
+            renderCluesGrid([]); showBoard('game-board');
+            handleTurn(data.currentPlayerId, data.currentPlayerName, data.turnEndTime);
         });
 
         socket.on('nextTurn', (data) => {
             renderCluesGrid(data.clues);
-            handleTurn(data.currentPlayerId, data.currentPlayerName);
+            handleTurn(data.currentPlayerId, data.currentPlayerName, data.turnEndTime);
         });
 
-        function handleTurn(playerId, playerName) {
+        function handleTurn(playerId, playerName, turnEndTime) {
             const clueAction = document.getElementById('clue-action');
             const turnInfo = document.getElementById('turn-info');
 
-            if (playerId === socket.id) {
+            if (playerId === localUserId) {
                 turnInfo.innerText = "";
                 clueAction.style.display = 'block';
                 document.getElementById('clue-input').focus();
             } else {
-                turnInfo.innerText = `C'est au tour de ${playerName}...`;
+                turnInfo.innerText = `Au tour de ${playerName}...`;
                 clueAction.style.display = 'none';
             }
+            if (turnEndTime) startLocalTimer(turnEndTime);
         }
 
         socket.on('endOfRounds', (clues) => {
+            stopLocalTimer();
             renderCluesGrid(clues);
-
-            const turnInfo = document.getElementById('turn-info');
-            const clueAction = document.getElementById('clue-action');
-            clueAction.style.display = 'none';
+            document.getElementById('clue-action').style.display = 'none';
 
             if (amIHost) {
-                turnInfo.innerHTML = "<span style='color:var(--success);'>Débattez, puis lancez les votes !</span>";
+                document.getElementById('turn-info').innerHTML = "<span style='color:var(--success);'>Débattez, puis lancez les votes !</span>";
                 document.getElementById('go-to-vote-btn').style.display = 'block';
             } else {
-                turnInfo.innerText = "Manche terminée. Le chef va bientôt lancer les votes...";
+                document.getElementById('turn-info').innerText = "Manche terminée. Le chef va lancer les votes...";
             }
         });
 
         socket.on('votePhase', (data) => {
             currentGameState = 'voting';
             showBoard('vote-board');
-
             document.getElementById('vote-options').style.display = 'block';
             document.getElementById('vote-status-msg').innerText = "";
             selectedVoteId = null;
@@ -760,9 +846,8 @@
             voteOptions.innerHTML = '';
 
             data.players.forEach(p => {
-                if (p.id !== socket.id) {
+                if (p.userId !== localUserId) {
                     const playerClues = data.clues.filter(c => c.playerName === p.name).map(c => c.word).join(' • ');
-
                     const btn = document.createElement('button');
                     btn.className = 'vote-btn';
                     btn.innerHTML = `
@@ -774,7 +859,7 @@
                             </span>
                         </div>
                     `;
-                    btn.onclick = () => selectVote(p.id, btn);
+                    btn.onclick = () => selectVote(p.userId, btn);
                     voteOptions.appendChild(btn);
                 }
             });
@@ -783,7 +868,6 @@
         socket.on('resultsRevealed', (data) => {
             currentGameState = 'results';
             document.getElementById('undercover-reveal').innerText = data.undercoverName;
-
             document.getElementById('civil-word-reveal').innerText = data.civilWord;
             document.getElementById('undercover-word-reveal').innerText = data.undercoverWord;
 
@@ -797,20 +881,61 @@
                 `;
             });
 
-            if (amIHost) {
-                document.getElementById('next-round-btn').style.display = 'block';
-            }
-
+            if (amIHost) document.getElementById('next-round-btn').style.display = 'block';
             showBoard('results-board');
         });
 
-        socket.on('gameOver', (players) => {
+        socket.on('gameOver', () => {
+            localStorage.removeItem('uc_room');
             document.getElementById('results-board').innerHTML = `
-                <h1 style="color:var(--primary); font-size: 2.5em; margin-bottom: 5px; text-align: center; border:none;">Partie Terminée</h1>
+                <h1 style="color:var(--primary); font-size: 2.5em; text-align: center; border:none;">Partie Terminée</h1>
                 <p style="color:var(--text-muted); margin-bottom: 30px; font-weight: 500; text-align: center;">Merci d'avoir joué !</p>
                 <button onclick="location.reload()" class="btn-primary">Retour à l'accueil</button>
             `;
             showBoard('results-board');
+        });
+
+        socket.on('reconnectFailed', () => {
+            localStorage.removeItem('uc_room');
+            document.getElementById('reconnect-msg').style.display = 'none';
+            document.getElementById('menu-content').style.display = 'block';
+        });
+
+        socket.on('reconnectSuccess', (data) => {
+            const room = data.room;
+            amIHost = room.players[0].userId === localUserId;
+            currentTurnOrder = room.turnOrder.map(p => p.name);
+            currentGameState = room.state;
+
+            if (room.state === 'waiting') {
+                document.getElementById('room-display').innerText = room.code;
+                showBoard('game-info');
+            } else if (room.state === 'playing') {
+                const me = room.players.find(p => p.userId === localUserId);
+                document.getElementById('round-display').innerText = `Manche ${room.currentRound}/${room.settings.totalRounds}`;
+                document.getElementById('secret-word').innerText = me.word;
+
+                const expectedPlayerId = room.turnOrder[room.currentTurnIndex].userId;
+                const expectedPlayerName = room.turnOrder[room.currentTurnIndex].name;
+
+                renderCluesGrid(room.clues);
+                showBoard('game-board');
+                handleTurn(expectedPlayerId, expectedPlayerName, room.turnEndTime);
+                document.getElementById('go-to-vote-btn').style.display = 'none';
+            } else if (room.state === 'waiting_for_vote') {
+                const me = room.players.find(p => p.userId === localUserId);
+                document.getElementById('secret-word').innerText = me.word;
+                renderCluesGrid(room.clues);
+                showBoard('game-board');
+                document.getElementById('turn-info').innerHTML = amIHost ? "<span style='color:var(--success);'>Débattez, puis lancez les votes !</span>" : "Manche terminée. Le chef va lancer les votes...";
+                document.getElementById('clue-action').style.display = 'none';
+                if (amIHost) document.getElementById('go-to-vote-btn').style.display = 'block';
+            } else if (room.state === 'voting') {
+                const playersToVoteFor = room.players.map(p => ({ userId: p.userId, name: p.name }));
+                socket.emit('hostStartVote', { roomCode: room.code, userId: room.players[0].userId });
+            } else if (room.state === 'results' && room.lastResults) {
+                socket.emit('resultsRevealed', room.lastResults);
+            }
         });
     </script>
 </body>
