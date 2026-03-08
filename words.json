@@ -1,0 +1,690 @@
+{
+    "Classique": [
+        {
+            "civil": "Ascenseur",
+            "undercover": "Escalier"
+        },
+        {
+            "civil": "Bain",
+            "undercover": "Océan"
+        },
+        {
+            "civil": "Bougie",
+            "undercover": "Lampe torche"
+        },
+        {
+            "civil": "Cheval",
+            "undercover": "Moto"
+        },
+        {
+            "civil": "Lunettes",
+            "undercover": "Jumelles"
+        },
+        {
+            "civil": "Couteau",
+            "undercover": "Épée"
+        },
+        {
+            "civil": "Parapluie",
+            "undercover": "Tente"
+        },
+        {
+            "civil": "Boussole",
+            "undercover": "GPS"
+        },
+        {
+            "civil": "Sable",
+            "undercover": "Neige"
+        },
+        {
+            "civil": "Château",
+            "undercover": "Gratte-ciel"
+        },
+        {
+            "civil": "Balai",
+            "undercover": "Aspirateur"
+        },
+        {
+            "civil": "Bière",
+            "undercover": "Café"
+        },
+        {
+            "civil": "Frigo",
+            "undercover": "Four"
+        },
+        {
+            "civil": "Squelette",
+            "undercover": "Fantôme"
+        },
+        {
+            "civil": "Gant",
+            "undercover": "Menottes"
+        },
+        {
+            "civil": "Avion",
+            "undercover": "Fusée"
+        },
+        {
+            "civil": "Journal",
+            "undercover": "Roman"
+        },
+        {
+            "civil": "Montre",
+            "undercover": "Réveil"
+        },
+        {
+            "civil": "Peinture",
+            "undercover": "Photographie"
+        },
+        {
+            "civil": "Théâtre",
+            "undercover": "Cinéma"
+        },
+        {
+            "civil": "Piscine",
+            "undercover": "Baignoire"
+        },
+        {
+            "civil": "Oreiller",
+            "undercover": "Matelas"
+        },
+        {
+            "civil": "Guitare",
+            "undercover": "Piano"
+        },
+        {
+            "civil": "Pont",
+            "undercover": "Tunnel"
+        },
+        {
+            "civil": "Savon",
+            "undercover": "Parfum"
+        },
+        {
+            "civil": "Livre",
+            "undercover": "Dictionnaire"
+        },
+        {
+            "civil": "Clé",
+            "undercover": "Serrure"
+        },
+        {
+            "civil": "Miroir",
+            "undercover": "Fenêtre"
+        },
+        {
+            "civil": "Tigre",
+            "undercover": "Chat domestique"
+        },
+        {
+            "civil": "Portefeuille",
+            "undercover": "Coffre-fort"
+        },
+        {
+            "civil": "Vélo",
+            "undercover": "Trottinette"
+        },
+        {
+            "civil": "Train",
+            "undercover": "Métro"
+        },
+        {
+            "civil": "Hélicoptère",
+            "undercover": "Drone"
+        },
+        {
+            "civil": "Bateau",
+            "undercover": "Radeau"
+        },
+        {
+            "civil": "Camion",
+            "undercover": "Bus"
+        },
+        {
+            "civil": "Tracteur",
+            "undercover": "Moissonneuse"
+        },
+        {
+            "civil": "Fleuve",
+            "undercover": "Canal"
+        },
+        {
+            "civil": "Grotte",
+            "undercover": "Mine"
+        },
+        {
+            "civil": "Forêt",
+            "undercover": "Parc"
+        },
+        {
+            "civil": "Île",
+            "undercover": "Continent"
+        },
+        {
+            "civil": "Tempête",
+            "undercover": "Tornade"
+        },
+        {
+            "civil": "Étoile",
+            "undercover": "Comète"
+        },
+        {
+            "civil": "Pluie",
+            "undercover": "Grêle"
+        },
+        {
+            "civil": "Nuage",
+            "undercover": "Brouillard"
+        },
+        {
+            "civil": "Cascade",
+            "undercover": "Fontaine"
+        },
+        {
+            "civil": "Marais",
+            "undercover": "Lac"
+        },
+        {
+            "civil": "Beurre",
+            "undercover": "Margarine"
+        },
+        {
+            "civil": "Crêpe",
+            "undercover": "Pancake"
+        },
+        {
+            "civil": "Glace",
+            "undercover": "Glaçon"
+        },
+        {
+            "civil": "Ketchup",
+            "undercover": "Mayonnaise"
+        },
+        {
+            "civil": "Thé",
+            "undercover": "Tisane"
+        },
+        {
+            "civil": "Champagne",
+            "undercover": "Cidre"
+        },
+        {
+            "civil": "Hamburger",
+            "undercover": "Hot-dog"
+        },
+        {
+            "civil": "Saucisson",
+            "undercover": "Chorizo"
+        },
+        {
+            "civil": "Croissant",
+            "undercover": "Brioche"
+        },
+        {
+            "civil": "Bonbon",
+            "undercover": "Chewing-gum"
+        },
+        {
+            "civil": "Chips",
+            "undercover": "Cacahuètes"
+        },
+        {
+            "civil": "Miel",
+            "undercover": "Sirop d'érable"
+        },
+        {
+            "civil": "Riz",
+            "undercover": "Semoule"
+        },
+        {
+            "civil": "Chien",
+            "undercover": "Loup"
+        },
+        {
+            "civil": "Chat",
+            "undercover": "Lion"
+        },
+        {
+            "civil": "Vache",
+            "undercover": "Taureau"
+        },
+        {
+            "civil": "Mouton",
+            "undercover": "Chèvre"
+        },
+        {
+            "civil": "Grenouille",
+            "undercover": "Crapaud"
+        },
+        {
+            "civil": "Serpent",
+            "undercover": "Ver de terre"
+        },
+        {
+            "civil": "Mouche",
+            "undercover": "Moustique"
+        },
+        {
+            "civil": "Abeille",
+            "undercover": "Guêpe"
+        },
+        {
+            "civil": "Araignée",
+            "undercover": "Scorpion"
+        },
+        {
+            "civil": "Corbeau",
+            "undercover": "Pigeon"
+        },
+        {
+            "civil": "Pingouin",
+            "undercover": "Canard"
+        },
+        {
+            "civil": "Requin",
+            "undercover": "Dauphin"
+        },
+        {
+            "civil": "Tortue",
+            "undercover": "Escargot"
+        },
+        {
+            "civil": "Lapin",
+            "undercover": "Lièvre"
+        },
+        {
+            "civil": "Souris",
+            "undercover": "Rat"
+        },
+        {
+            "civil": "Chaise",
+            "undercover": "Tabouret"
+        },
+        {
+            "civil": "Canapé",
+            "undercover": "Fauteuil"
+        },
+        {
+            "civil": "Lit",
+            "undercover": "Hamac"
+        },
+        {
+            "civil": "Télévision",
+            "undercover": "Écran d'ordinateur"
+        },
+        {
+            "civil": "Tapis",
+            "undercover": "Moquette"
+        },
+        {
+            "civil": "Assiette",
+            "undercover": "Bol"
+        },
+        {
+            "civil": "Fourchette",
+            "undercover": "Cuillère"
+        },
+        {
+            "civil": "Verre",
+            "undercover": "Tasse"
+        },
+        {
+            "civil": "Ciseaux",
+            "undercover": "Pince"
+        },
+        {
+            "civil": "Brosse",
+            "undercover": "Peigne"
+        },
+        {
+            "civil": "Shampooing",
+            "undercover": "Gel douche"
+        },
+        {
+            "civil": "Serviette",
+            "undercover": "Peignoir"
+        },
+        {
+            "civil": "Chaussure",
+            "undercover": "Botte"
+        },
+        {
+            "civil": "Chaussette",
+            "undercover": "Gant"
+        },
+        {
+            "civil": "Chapeau",
+            "undercover": "Casquette"
+        },
+        {
+            "civil": "Masque",
+            "undercover": "Casque"
+        },
+        {
+            "civil": "Chronomètre",
+            "undercover": "Minuteur"
+        },
+        {
+            "civil": "Sac à dos",
+            "undercover": "Valise"
+        },
+        {
+            "civil": "Badge",
+            "undercover": "Passeport"
+        },
+        {
+            "civil": "Stylo",
+            "undercover": "Surligneur"
+        },
+        {
+            "civil": "Cahier",
+            "undercover": "Classeur"
+        },
+        {
+            "civil": "Gomme",
+            "undercover": "Correcteur (Tipp-Ex)"
+        },
+        {
+            "civil": "Crayon",
+            "undercover": "Pinceau"
+        },
+        {
+            "civil": "Téléphone",
+            "undercover": "Talkie-walkie"
+        },
+        {
+            "civil": "Frigo",
+            "undercover": "Congélateur"
+        },
+        {
+            "civil": "Four",
+            "undercover": "Micro-ondes"
+        },
+        {
+            "civil": "Poêle",
+            "undercover": "Casserole"
+        },
+        {
+            "civil": "Boulanger",
+            "undercover": "Pâtissier"
+        },
+        {
+            "civil": "Boucher",
+            "undercover": "Poissonnier"
+        },
+        {
+            "civil": "Médecin",
+            "undercover": "Vétérinaire"
+        },
+        {
+            "civil": "Pompier",
+            "undercover": "Ambulancier"
+        },
+        {
+            "civil": "Policier",
+            "undercover": "Gendarme"
+        },
+        {
+            "civil": "Juge",
+            "undercover": "Avocat"
+        },
+        {
+            "civil": "Chanteur",
+            "undercover": "Musicien"
+        },
+        {
+            "civil": "Acteur",
+            "undercover": "Réalisateur"
+        },
+        {
+            "civil": "Peintre",
+            "undercover": "Sculpteur"
+        },
+        {
+            "civil": "Football",
+            "undercover": "Rugby"
+        },
+        {
+            "civil": "Tennis",
+            "undercover": "Badminton"
+        },
+        {
+            "civil": "Basketball",
+            "undercover": "Volleyball"
+        },
+        {
+            "civil": "Piscine",
+            "undercover": "Aquarium"
+        },
+        {
+            "civil": "Opéra",
+            "undercover": "Concert"
+        },
+        {
+            "civil": "Musée",
+            "undercover": "Galerie d'art"
+        },
+        {
+            "civil": "Poésie",
+            "undercover": "Chanson"
+        },
+        {
+            "civil": "Histoire",
+            "undercover": "Légende"
+        },
+        {
+            "civil": "Rêve",
+            "undercover": "Cauchemar"
+        },
+        {
+            "civil": "Sourire",
+            "undercover": "Rire"
+        },
+        {
+            "civil": "Pleurer",
+            "undercover": "Crier"
+        }
+    ],
+    "Anime": [
+        {
+            "civil": "Ninja",
+            "undercover": "Samouraï"
+        },
+        {
+            "civil": "Démon",
+            "undercover": "Dragon"
+        },
+        {
+            "civil": "Tournoi",
+            "undercover": "Examen"
+        },
+        {
+            "civil": "Manga",
+            "undercover": "Light Novel"
+        },
+        {
+            "civil": "Mecha",
+            "undercover": "Cyborg"
+        },
+        {
+            "civil": "Sensei",
+            "undercover": "Capitaine"
+        },
+        {
+            "civil": "Katana",
+            "undercover": "Faux (Arme)"
+        },
+        {
+            "civil": "Chakra",
+            "undercover": "Mana"
+        },
+        {
+            "civil": "Magie",
+            "undercover": "Alchimie"
+        },
+        {
+            "civil": "Isekai",
+            "undercover": "Voyage temporel"
+        },
+        {
+            "civil": "Shonen",
+            "undercover": "Shojo"
+        },
+        {
+            "civil": "Héros",
+            "undercover": "Anti-héros"
+        },
+        {
+            "civil": "Guilde",
+            "undercover": "Gouvernement"
+        },
+        {
+            "civil": "Saiyan",
+            "undercover": "Titan"
+        },
+        {
+            "civil": "Waifu",
+            "undercover": "Tsundere"
+        },
+        {
+            "civil": "Kaméhaméha",
+            "undercover": "Rasengan"
+        },
+        {
+            "civil": "Épée maudite",
+            "undercover": "Bouclier sacré"
+        },
+        {
+            "civil": "Académie",
+            "undercover": "Donjon"
+        },
+        {
+            "civil": "Gobelin",
+            "undercover": "Slime"
+        },
+        {
+            "civil": "Opening (Générique)",
+            "undercover": "Ending (Générique)"
+        },
+        {
+            "civil": "Shinigami",
+            "undercover": "Faucheuse"
+        },
+        {
+            "civil": "Pirate",
+            "undercover": "Voleur"
+        },
+        {
+            "civil": "Démon à queues",
+            "undercover": "Esprit familier"
+        },
+        {
+            "civil": "Hokage",
+            "undercover": "Empereur"
+        },
+        {
+            "civil": "Chasseur",
+            "undercover": "Aventurier"
+        },
+        {
+            "civil": "Épisode filler",
+            "undercover": "OAV"
+        },
+        {
+            "civil": "Super pouvoir",
+            "undercover": "Mutation"
+        },
+        {
+            "civil": "Invocation",
+            "undercover": "Pacte magique"
+        },
+        {
+            "civil": "Labyrinthe",
+            "undercover": "Tour infinie"
+        },
+        {
+            "civil": "Boss final",
+            "undercover": "Rival"
+        },
+        {
+            "civil": "Armure magique",
+            "undercover": "Exosquelette"
+        },
+        {
+            "civil": "Boule de cristal",
+            "undercover": "Radar"
+        },
+        {
+            "civil": "Shenron (Dragon)",
+            "undercover": "Génie de la lampe"
+        },
+        {
+            "civil": "Goule",
+            "undercover": "Vampire"
+        },
+        {
+            "civil": "Art martial",
+            "undercover": "Boxe"
+        },
+        {
+            "civil": "Flashback",
+            "undercover": "Rêve"
+        },
+        {
+            "civil": "Épéiste",
+            "undercover": "Archer"
+        },
+        {
+            "civil": "Cosplay",
+            "undercover": "Déguisement"
+        },
+        {
+            "civil": "Convention",
+            "undercover": "Festival"
+        },
+        {
+            "civil": "Figurine",
+            "undercover": "Peluche"
+        },
+        {
+            "civil": "Otaku",
+            "undercover": "Geek"
+        },
+        {
+            "civil": "Épisode",
+            "undercover": "Chapitre"
+        },
+        {
+            "civil": "Sorcier",
+            "undercover": "Magicien"
+        },
+        {
+            "civil": "Dieu",
+            "undercover": "Créateur"
+        },
+        {
+            "civil": "Réincarnation",
+            "undercover": "Résurrection"
+        },
+        {
+            "civil": "Kaiju",
+            "undercover": "Monstre géant"
+        },
+        {
+            "civil": "Attaque ultime",
+            "undercover": "Coup critique"
+        },
+        {
+            "civil": "Vaisseau spatial",
+            "undercover": "Machine à remonter le temps"
+        },
+        {
+            "civil": "Bâton magique",
+            "undercover": "Baguette magique"
+        },
+        {
+            "civil": "Sceau",
+            "undercover": "Symbole"
+        }
+    ]
+}

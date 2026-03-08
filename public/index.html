@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undercover - Le Jeu</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-card: rgba(26, 29, 39, 0.85);
+            --bg-input: rgba(35, 39, 54, 0.9);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --border: rgba(45, 49, 66, 0.8);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(-45deg, #0f111a, #1a1b2e, #131b2f, #0f111a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .layout-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            align-items: flex-start;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout-wrapper {
+                flex-direction: column-reverse;
+            }
+
+            .sidebar,
+            .main-content {
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+        }
+
+        .main-content,
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar {
+            width: 280px;
+            padding: 20px;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0 0 25px 0;
+            text-align: center;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        input::placeholder {
+            color: #475569;
+            text-transform: none;
+            font-weight: 400;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .settings-row div {
+            flex: 1;
+        }
+
+        .settings-row label {
+            display: block;
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        button {
+            padding: 14px 20px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(129, 140, 248, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(129, 140, 248, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #3b3f51;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .menu-block {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .player-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+
+        .player-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-size: 1em;
+            text-transform: uppercase;
+        }
+
+        .player-score {
+            color: var(--primary);
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        .player-status {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 6px;
+            width: fit-content;
+        }
+
+        .status-waiting {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-muted);
+        }
+
+        .status-voted {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .clues-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .player-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .player-column-header {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .player-column-word {
+            background: var(--bg-input);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+            animation: popIn 0.3s ease forwards;
+        }
+
+        .my-turn {
+            background: rgba(129, 140, 248, 0.1);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(129, 140, 248, 0.1);
+        }
+
+        .secret-text {
+            color: var(--primary);
+            font-size: 2.2em;
+            margin: 10px 0 25px 0;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
+        }
+
+        .vote-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.2s;
+        }
+
+        .vote-btn:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .vote-btn.selected {
+            background: rgba(129, 140, 248, 0.15);
+            border-color: var(--primary);
+            box-shadow: inset 0 0 15px rgba(129, 140, 248, 0.1);
+        }
+
+        #custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #custom-modal {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="custom-modal-overlay">
+        <div id="custom-modal">
+            <h2 id="custom-modal-title" style="border:none;">Info</h2>
+            <p id="custom-modal-msg" style="color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">Message
+                ici</p>
+            <button class="btn-primary" onclick="closeModal()">Fermer</button>
+        </div>
+    </div>
+
+    <div class="layout-wrapper">
+
+        <div class="sidebar" id="sidebar" style="display: none;">
+            <h2 style="font-size: 1.2em; border:none; margin-bottom: 15px;">Joueurs</h2>
+            <div id="sidebar-players"></div>
+        </div>
+
+        <div class="main-content">
+
+            <div id="menu" class="fade-in-up">
+                <h1>UNDERCOVER</h1>
+
+                <div style="margin-bottom: 30px;">
+                    <label
+                        style="display: block; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-align: left;">Ton
+                        Pseudo :</label>
+                    <input type="text" id="globalPlayerName" placeholder="ENTRE TON PSEUDO..." required
+                        oninput="this.value = this.value.toUpperCase()">
+                </div>
+
+                <div class="menu-block" style="margin-bottom: 20px;">
+                    <h3>Créer un salon</h3>
+
+                    <div style="margin-top: 5px;">
+                        <label
+                            style="display: block; font-size: 0.8em; color: var(--text-muted); margin-bottom: 5px;">Thème
+                            de la partie</label>
+                        <select id="gameTheme">
+                            <option value="Mixte">Mixte (Classique + Anime)</option>
+                            <option value="Classique">Classique Uniquement</option>
+                            <option value="Anime">100% Animé Uniquement</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-row">
+                        <div><label>Mots / Joueur</label><input type="number" id="wordsPerPerson" value="2" min="1"
+                                max="5"></div>
+                        <div><label>Manches</label><input type="number" id="totalRounds" value="1" min="1" max="10">
+                        </div>
+                    </div>
+                    <button onclick="createRoom()" class="btn-primary" style="margin-top: 10px;">Créer la
+                        partie</button>
+                </div>
+
+                <div class="menu-block">
+                    <h3>Rejoindre un salon</h3>
+                    <input type="text" id="roomCodeInput" placeholder="CODE (EX: A4X9)" maxlength="4"
+                        style="text-align: center; font-weight: bold; letter-spacing: 3px;"
+                        oninput="this.value = this.value.toUpperCase()">
+                    <button onclick="joinRoom()" class="btn-secondary">Rejoindre</button>
+                </div>
+            </div>
+
+            <div id="game-info" style="display: none;">
+                <h3 style="text-align: center;">Code du salon</h3>
+                <h1 style="color: var(--primary); font-size: 3.5em; letter-spacing: 8px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(129, 140, 248, 0.4);"
+                    id="room-display"></h1>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Partagez ce code avec vos
+                    amis.</p>
+                <button id="start-btn" onclick="startGame()" class="btn-success" style="display: none;">Démarrer la
+                    partie</button>
+            </div>
+
+            <div id="game-board" style="display: none;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                    <h3 style="margin:0;">Mot secret</h3>
+                    <span style="color: var(--text-muted); font-size: 0.85em; font-weight: 600;"
+                        id="round-display"></span>
+                </div>
+
+                <div class="secret-text" id="secret-word"></div>
+
+                <div id="turn-info"
+                    style="font-size: 1.05em; font-weight: 500; text-align: center; color: var(--text-muted); margin-top: 10px;">
+                </div>
+
+                <div id="clue-action" style="display: none;" class="my-turn">
+                    <h3 style="margin-top: 0; color: var(--primary);">À ton tour d'écrire !</h3>
+                    <input type="text" id="clue-input" placeholder="SAISIS TON MOT ICI..." maxlength="20"
+                        oninput="this.value = this.value.toUpperCase()">
+                    <button onclick="submitClue()" class="btn-primary">Envoyer l'indice</button>
+                </div>
+
+                <button id="go-to-vote-btn" onclick="goToVote()" class="btn-success"
+                    style="display: none; margin-top: 20px;">Passer aux votes</button>
+
+                <div style="margin-top: 35px;">
+                    <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px;">Mots donnés</h3>
+                    <div id="clues-container" class="clues-container"></div>
+                </div>
+            </div>
+
+            <div id="vote-board" style="display: none;">
+                <h2>Phase de vote</h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">Sélectionnez l'Undercover selon ses mots. Le
+                    résultat s'affichera dès que tout le monde aura voté.</p>
+
+                <div id="vote-options"></div>
+
+                <button id="confirm-vote-btn" onclick="confirmVote()" class="btn-primary"
+                    style="display: none; margin-top: 20px;">Confirmer mon vote</button>
+                <p id="vote-status-msg"
+                    style="margin-top: 20px; text-align: center; color: var(--success); font-weight: 500;"></p>
+            </div>
+
+            <div id="results-board" style="display: none;">
+                <h2 style="text-align: center; border:none;">Résultats</h2>
+
+                <div
+                    style="text-align: center; margin: 10px 0 30px 0; padding: 25px; background: rgba(244, 63, 94, 0.05); border-radius: 16px; border: 1px solid rgba(244, 63, 94, 0.2); box-shadow: inset 0 0 20px rgba(244, 63, 94, 0.05);">
+                    <h3 style="margin-bottom: 10px;">L'Undercover était</h3>
+                    <div id="undercover-reveal"
+                        style="color: var(--danger); font-size: 2.2em; font-weight: 800; text-transform: uppercase; text-shadow: 0 0 15px rgba(244, 63, 94, 0.4);">
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <div
+                            style="background: rgba(255,255,255,0.05); padding: 12px 20px; border-radius: 10px; border: 1px solid var(--border); flex: 1; min-width: 150px;">
+                            <span
+                                style="font-size: 0.85em; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: 600;">Mot
+                                des Civils</span>
+                            <strong id="civil-word-reveal"
+                                style="color: var(--text-main); font-size: 1.1em; text-transform: uppercase;"></strong>
+                        </div>
+                        <div
+                            style="background: rgba(244, 63, 94, 0.1); padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(244, 63, 94, 0.3); flex: 1; min-width: 150px;">
+                            <span
+                                style="font-size: 0.85em; color: var(--danger); display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: 600;">Mot
+                                Undercover</span>
+                            <strong id="undercover-word-reveal"
+                                style="color: var(--danger); font-size: 1.1em; text-transform: uppercase;"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px;">Récapitulatif des votes</h3>
+                <ul id="vote-recap-list" style="margin-top: 15px;"></ul>
+
+                <button id="next-round-btn" onclick="nextRound()" class="btn-primary"
+                    style="display: none; margin-top: 30px;">Lancer la manche suivante</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentRoomCode = "";
+        let amIHost = false;
+        let selectedVoteId = null;
+        let currentGameState = 'waiting';
+        let currentTurnOrder = [];
+
+        function showBoard(boardId) {
+            ['menu', 'game-info', 'game-board', 'vote-board', 'results-board'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+                document.getElementById(id).classList.remove('fade-in-up');
+            });
+            const board = document.getElementById(boardId);
+            board.style.display = 'block';
+            void board.offsetWidth;
+            board.classList.add('fade-in-up');
+            document.getElementById('sidebar').style.display = (boardId === 'menu') ? 'none' : 'block';
+        }
+
+        function showModal(title, message) {
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-msg').innerText = message;
+            document.getElementById('custom-modal-overlay').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('custom-modal-overlay').style.display = 'none'; }
+
+        function createRoom() {
+            const name = document.getElementById('globalPlayerName').value.trim();
+            if (!name) return showModal("Action requise", "Veuillez choisir un pseudo.");
+            amIHost = true;
+            socket.emit('createRoom', {
+                playerName: name,
+                wordsPerPerson: document.getElementById('wordsPerPerson').value,
+                totalRounds: document.getElementById('totalRounds').value,
+                theme: document.getElementById('gameTheme').value // Envoi du thème
+            });
+            document.getElementById('start-btn').style.display = 'block';
+        }
+
+        function joinRoom() {
+            const name = document.getElementById('globalPlayerName').value.trim();
+            const code = document.getElementById('roomCodeInput').value.trim();
+            if (!name || !code) return showModal("Action requise", "Veuillez remplir votre pseudo et le code.");
+            amIHost = false;
+            socket.emit('joinRoom', { code: code, playerName: name });
+        }
+
+        function startGame() { socket.emit('startGame', currentRoomCode); }
+        function nextRound() { socket.emit('nextRound', currentRoomCode); }
+        function goToVote() { socket.emit('hostStartVote', currentRoomCode); }
+
+        function submitClue() {
+            const clue = document.getElementById('clue-input').value.trim();
+            if (!clue) return showModal("Attention", "Ton mot ne peut pas être vide.");
+            socket.emit('submitClue', { roomCode: currentRoomCode, clue: clue });
+            document.getElementById('clue-input').value = "";
+            document.getElementById('clue-action').style.display = 'none';
+        }
+
+        function selectVote(playerId, buttonElement) {
+            selectedVoteId = playerId;
+            document.querySelectorAll('.vote-btn').forEach(btn => btn.classList.remove('selected'));
+            buttonElement.classList.add('selected');
+            document.getElementById('confirm-vote-btn').style.display = 'block';
+        }
+
+        function confirmVote() {
+            if (!selectedVoteId) return;
+            socket.emit('submitVote', { roomCode: currentRoomCode, votedId: selectedVoteId });
+            document.getElementById('vote-options').style.display = 'none';
+            document.getElementById('confirm-vote-btn').style.display = 'none';
+            document.getElementById('vote-status-msg').innerText = "Vote enregistré. En attente des autres...";
+        }
+
+        function renderCluesGrid(clues) {
+            const container = document.getElementById('clues-container');
+            container.innerHTML = '';
+
+            currentTurnOrder.forEach(playerName => {
+                const col = document.createElement('div');
+                col.className = 'player-column';
+
+                const header = document.createElement('div');
+                header.className = 'player-column-header';
+                header.innerText = playerName;
+                col.appendChild(header);
+
+                const playerClues = clues.filter(c => c.playerName === playerName);
+                playerClues.forEach(c => {
+                    const wordDiv = document.createElement('div');
+                    wordDiv.className = 'player-column-word';
+                    wordDiv.innerText = c.word;
+                    col.appendChild(wordDiv);
+                });
+
+                container.appendChild(col);
+            });
+        }
+
+        socket.on('updateSidebar', (players) => {
+            const sidebar = document.getElementById('sidebar-players');
+            sidebar.innerHTML = '';
+
+            players.forEach(p => {
+                let statusHtml = '';
+                if (currentGameState === 'voting') {
+                    if (p.hasVoted) {
+                        statusHtml = `<div class="player-status status-voted">A voté ✅</div>`;
+                    } else {
+                        statusHtml = `<div class="player-status status-waiting">En réflexion...</div>`;
+                    }
+                }
+
+                sidebar.innerHTML += `
+                    <div class="player-card">
+                        <div class="player-card-header">
+                            <span class="player-name">${p.name}</span>
+                            <span class="player-score">${p.score} pts</span>
+                        </div>
+                        ${statusHtml}
+                    </div>
+                `;
+            });
+        });
+
+        socket.on('error', (msg) => showModal("Erreur", msg));
+
+        socket.on('roomCreated', (code) => {
+            currentRoomCode = code;
+            document.getElementById('room-display').innerText = code;
+            currentGameState = 'waiting';
+            showBoard('game-info');
+        });
+
+        socket.on('roomJoined', (code) => {
+            currentRoomCode = code;
+            document.getElementById('room-display').innerText = code;
+            currentGameState = 'waiting';
+            showBoard('game-info');
+        });
+
+        socket.on('gameStarted', (data) => {
+            currentGameState = 'playing';
+            currentTurnOrder = data.turnOrder;
+
+            document.getElementById('round-display').innerText = `Manche ${data.currentRound}/${data.totalRounds}`;
+            document.getElementById('secret-word').innerText = data.word;
+            document.getElementById('go-to-vote-btn').style.display = 'none';
+
+            renderCluesGrid([]);
+            showBoard('game-board');
+            handleTurn(data.currentPlayerId, data.currentPlayerName);
+        });
+
+        socket.on('nextTurn', (data) => {
+            renderCluesGrid(data.clues);
+            handleTurn(data.currentPlayerId, data.currentPlayerName);
+        });
+
+        function handleTurn(playerId, playerName) {
+            const clueAction = document.getElementById('clue-action');
+            const turnInfo = document.getElementById('turn-info');
+
+            if (playerId === socket.id) {
+                turnInfo.innerText = "";
+                clueAction.style.display = 'block';
+                document.getElementById('clue-input').focus();
+            } else {
+                turnInfo.innerText = `C'est au tour de ${playerName}...`;
+                clueAction.style.display = 'none';
+            }
+        }
+
+        socket.on('endOfRounds', (clues) => {
+            renderCluesGrid(clues);
+
+            const turnInfo = document.getElementById('turn-info');
+            const clueAction = document.getElementById('clue-action');
+            clueAction.style.display = 'none';
+
+            if (amIHost) {
+                turnInfo.innerHTML = "<span style='color:var(--success);'>Débattez, puis lancez les votes !</span>";
+                document.getElementById('go-to-vote-btn').style.display = 'block';
+            } else {
+                turnInfo.innerText = "Manche terminée. Le chef va bientôt lancer les votes...";
+            }
+        });
+
+        socket.on('votePhase', (data) => {
+            currentGameState = 'voting';
+            showBoard('vote-board');
+
+            document.getElementById('vote-options').style.display = 'block';
+            document.getElementById('vote-status-msg').innerText = "";
+            selectedVoteId = null;
+
+            const voteOptions = document.getElementById('vote-options');
+            voteOptions.innerHTML = '';
+
+            data.players.forEach(p => {
+                if (p.id !== socket.id) {
+                    const playerClues = data.clues.filter(c => c.playerName === p.name).map(c => c.word).join(' • ');
+
+                    const btn = document.createElement('button');
+                    btn.className = 'vote-btn';
+                    btn.innerHTML = `
+                        <div style="font-size: 1.5em; margin-top: 5px;">🕵️</div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <span style="font-size: 1.1em; font-weight: 700; text-transform: uppercase;">${p.name}</span>
+                            <span style="font-size: 0.85em; color: var(--primary); margin-top: 4px; font-weight: 600;">
+                                Mots : <span style="color: var(--text-muted); font-weight: 400; text-transform: uppercase;">${playerClues}</span>
+                            </span>
+                        </div>
+                    `;
+                    btn.onclick = () => selectVote(p.id, btn);
+                    voteOptions.appendChild(btn);
+                }
+            });
+        });
+
+        socket.on('resultsRevealed', (data) => {
+            currentGameState = 'results';
+            document.getElementById('undercover-reveal').innerText = data.undercoverName;
+
+            document.getElementById('civil-word-reveal').innerText = data.civilWord;
+            document.getElementById('undercover-word-reveal').innerText = data.undercoverWord;
+
+            const recapList = document.getElementById('vote-recap-list');
+            recapList.innerHTML = '';
+            data.voteRecap.forEach(v => {
+                recapList.innerHTML += `
+                    <li style="padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95em; text-transform: uppercase;">
+                        <strong>${v.voterName}</strong> a voté <span style="color:var(--danger); font-weight:600;">${v.votedName}</span>
+                    </li>
+                `;
+            });
+
+            if (amIHost) {
+                document.getElementById('next-round-btn').style.display = 'block';
+            }
+
+            showBoard('results-board');
+        });
+
+        socket.on('gameOver', (players) => {
+            document.getElementById('results-board').innerHTML = `
+                <h1 style="color:var(--primary); font-size: 2.5em; margin-bottom: 5px; text-align: center; border:none;">Partie Terminée</h1>
+                <p style="color:var(--text-muted); margin-bottom: 30px; font-weight: 500; text-align: center;">Merci d'avoir joué !</p>
+                <button onclick="location.reload()" class="btn-primary">Retour à l'accueil</button>
+            `;
+            showBoard('results-board');
+        });
+    </script>
+</body>
+
+</html>
