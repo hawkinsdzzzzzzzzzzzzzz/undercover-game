@@ -29,8 +29,11 @@ function processResults(roomCode) {
     const room = games[roomCode];
     room.state = 'results';
 
-    const undercover = room.players.find(p => p.role === 'Undercover');
-    const civil = room.players.find(p => p.role === 'Civil');
+    const undercovers = room.players.filter(p => p.role === 'Undercover');
+    const mrWhites = room.players.filter(p => p.role === 'Mr White');
+    const civils = room.players.filter(p => p.role === 'Civil');
+
+    const badGuysIds = [...undercovers, ...mrWhites].map(p => p.userId);
 
     const roundScores = {};
     room.players.forEach(p => roundScores[p.userId] = 0);
@@ -43,21 +46,36 @@ function processResults(roomCode) {
 
         voteRecap.push({ voterName: voter.name, votedName: voted ? voted.name : "Personne" });
 
-        if (voterId === undercover.userId) continue;
-
-        if (votedId === undercover.userId) {
-            roundScores[voterId] += 10;
-            voter.score += 10;
-        } else {
-            roundScores[undercover.userId] += 10;
-            undercover.score += 10;
+        if (voter.role === 'Civil') {
+            if (badGuysIds.includes(votedId)) {
+                roundScores[voterId] += 10;
+                voter.score += 10;
+            }
         }
     }
 
+    badGuysIds.forEach(bgId => {
+        const badGuy = room.players.find(p => p.userId === bgId);
+        let votesAgainstMe = 0;
+
+        for (const [voterId, votedId] of Object.entries(room.votes)) {
+            const voter = room.players.find(p => p.userId === voterId);
+            if (voter.role === 'Civil' && votedId === bgId) {
+                votesAgainstMe++;
+            }
+        }
+
+        const civilsCount = civils.length;
+        const points = (civilsCount - votesAgainstMe) * 10;
+        roundScores[bgId] += points;
+        badGuy.score += points;
+    });
+
     room.lastResults = {
-        undercoverName: undercover.name,
-        undercoverWord: undercover.word,
-        civilWord: civil ? civil.word : "Inconnu",
+        undercovers: undercovers.map(u => u.name),
+        mrWhites: mrWhites.map(m => m.name),
+        undercoverWord: undercovers.length > 0 ? undercovers[0].word : null,
+        civilWord: civils.length > 0 ? civils[0].word : "Inconnu",
         voteRecap: voteRecap,
         roundScores: roundScores,
         players: room.players
@@ -67,7 +85,6 @@ function processResults(roomCode) {
     broadcastSidebar(roomCode);
 }
 
-// Gère la soumission d'un mot (manuel ou forcé par le timer)
 function handleClueSubmission(roomCode, expectedUserId, clueText) {
     const room = games[roomCode];
     if (!room || room.state !== 'playing') return;
@@ -75,7 +92,6 @@ function handleClueSubmission(roomCode, expectedUserId, clueText) {
     const expectedPlayer = room.turnOrder[room.currentTurnIndex];
     if (expectedPlayer.userId !== expectedUserId) return;
 
-    // On efface le timer pour ne pas qu'il s'active en double
     clearTimeout(room.turnTimer);
 
     room.clues.push({ playerName: expectedPlayer.name, word: clueText });
@@ -88,13 +104,20 @@ function handleClueSubmission(roomCode, expectedUserId, clueText) {
 
     if (room.currentCycle > room.settings.wordsPerPerson) {
         room.state = 'waiting_for_vote';
-        io.to(roomCode).emit('endOfRounds', room.clues);
+        room.readyToVote = [];
+        const required = Math.floor(room.players.length / 2) + 1;
+
+        io.to(roomCode).emit('endOfRounds', {
+            clues: room.clues,
+            readyCount: 0,
+            total: room.players.length,
+            required: required
+        });
         broadcastSidebar(roomCode);
     } else {
         const nextPlayer = room.turnOrder[room.currentTurnIndex];
-        room.turnEndTime = Date.now() + 30000; // 30 secondes
+        room.turnEndTime = Date.now() + 30000;
 
-        // On lance le timer pour le prochain joueur
         room.turnTimer = setTimeout(() => {
             handleClueSubmission(roomCode, nextPlayer.userId, "⏳ TROP LENT");
         }, 30000);
@@ -116,6 +139,7 @@ function startNewRound(roomCode) {
     room.currentCycle = 1;
     room.clues = [];
     room.votes = {};
+    room.readyToVote = [];
     clearTimeout(room.turnTimer);
 
     let pool = [];
@@ -135,16 +159,28 @@ function startNewRound(roomCode) {
     room.usedWords.push(randomPair.civil);
     if (room.usedWords.length > 20) room.usedWords.shift();
 
-    const undercoverIndex = Math.floor(Math.random() * room.players.length);
+    let rolesArray = [];
+    let ucCount = Math.min(room.settings.undercoverCount, room.players.length - 1);
+    let mwCount = Math.min(room.settings.mrWhiteCount, room.players.length - ucCount - 1);
+
+    if (ucCount < 0) ucCount = 0;
+    if (mwCount < 0) mwCount = 0;
+
+    for (let i = 0; i < ucCount; i++) rolesArray.push('Undercover');
+    for (let i = 0; i < mwCount; i++) rolesArray.push('Mr White');
+    while (rolesArray.length < room.players.length) rolesArray.push('Civil');
+
+    rolesArray = rolesArray.sort(() => Math.random() - 0.5);
     room.turnOrder = [...room.players].sort(() => Math.random() - 0.5);
 
     room.players.forEach((player, index) => {
-        if (index === undercoverIndex) {
-            player.role = 'Undercover';
+        player.role = rolesArray[index];
+        if (player.role === 'Undercover') {
             player.word = randomPair.undercover;
-        } else {
-            player.role = 'Civil';
+        } else if (player.role === 'Civil') {
             player.word = randomPair.civil;
+        } else if (player.role === 'Mr White') {
+            player.word = "MR WHITE";
         }
 
         io.to(player.socketId).emit('gameStarted', {
@@ -155,11 +191,10 @@ function startNewRound(roomCode) {
             currentRound: room.currentRound,
             totalRounds: room.settings.totalRounds,
             wordsPerPerson: room.settings.wordsPerPerson,
-            turnEndTime: Date.now() + 30000 // Fin du premier tour dans 30s
+            turnEndTime: Date.now() + 30000
         });
     });
 
-    // Lancer le timer pour le 1er joueur
     room.turnTimer = setTimeout(() => {
         handleClueSubmission(roomCode, room.turnOrder[0].userId, "⏳ TROP LENT");
     }, 30000);
@@ -169,7 +204,6 @@ function startNewRound(roomCode) {
 
 io.on('connection', (socket) => {
 
-    // --- RECONNEXION AUTOMATIQUE ---
     socket.on('reconnectUser', (data) => {
         const room = games[data.roomCode];
         if (room) {
@@ -184,6 +218,8 @@ io.on('connection', (socket) => {
                     room: room,
                     myUserId: data.userId
                 });
+                // Envoi de l'historique du chat à la reconnexion
+                socket.emit('chatHistory', room.chat);
                 broadcastSidebar(data.roomCode);
                 return;
             }
@@ -199,9 +235,11 @@ io.on('connection', (socket) => {
             players: [{ userId: data.userId, socketId: socket.id, name: data.playerName, role: null, word: null, score: 0, connected: true }],
             state: 'waiting',
             settings: {
-                wordsPerPerson: parseInt(data.wordsPerPerson) || 2,
-                totalRounds: parseInt(data.totalRounds) || 1,
-                theme: data.theme || 'Mixte'
+                wordsPerPerson: 2,
+                totalRounds: 3,
+                theme: 'Mixte',
+                undercoverCount: 1,
+                mrWhiteCount: 0
             },
             currentRound: 1,
             turnOrder: [],
@@ -209,11 +247,14 @@ io.on('connection', (socket) => {
             currentCycle: 1,
             clues: [],
             votes: {},
-            usedWords: []
+            readyToVote: [],
+            usedWords: [],
+            chat: [] // NOUVEAU: Historique du chat
         };
 
         socket.join(roomCode);
-        socket.emit('roomCreated', roomCode);
+        socket.emit('roomCreated', { roomCode, settings: games[roomCode].settings });
+        socket.emit('chatHistory', games[roomCode].chat);
         broadcastSidebar(roomCode);
     });
 
@@ -227,14 +268,36 @@ io.on('connection', (socket) => {
                 room.players.push({ userId: data.userId, socketId: socket.id, name: data.playerName, role: null, word: null, score: 0, connected: true });
             }
             socket.join(roomCode);
-            socket.emit('roomJoined', roomCode);
+            socket.emit('roomJoined', { roomCode, settings: room.settings });
+            socket.emit('chatHistory', room.chat); // Envoi du chat aux nouveaux
             broadcastSidebar(roomCode);
         } else {
             socket.emit('error', 'Salon introuvable ou partie en cours.');
         }
     });
 
-    // QUITTER LE SALON DÉFINITIVEMENT
+    // --- NOUVEAU : GESTION DU CHAT ---
+    socket.on('sendMessage', (data) => {
+        const room = games[data.roomCode];
+        if (room) {
+            const player = room.players.find(p => p.userId === data.userId);
+            if (player) {
+                const msg = { sender: player.name, text: data.text };
+                room.chat.push(msg);
+                if (room.chat.length > 50) room.chat.shift(); // Garde les 50 derniers messages
+                io.to(data.roomCode).emit('receiveMessage', msg);
+            }
+        }
+    });
+
+    socket.on('updateSettings', (data) => {
+        const room = games[data.roomCode];
+        if (room && room.state === 'waiting' && room.players[0].userId === data.userId) {
+            room.settings = { ...room.settings, ...data.settings };
+            io.to(data.roomCode).emit('settingsUpdated', room.settings);
+        }
+    });
+
     socket.on('leaveRoom', (data) => {
         const room = games[data.roomCode];
         if (room) {
@@ -260,13 +323,27 @@ io.on('connection', (socket) => {
         handleClueSubmission(data.roomCode, data.userId, data.clue);
     });
 
-    socket.on('hostStartVote', (data) => {
+    socket.on('playerReadyToVote', (data) => {
         const room = games[data.roomCode];
-        if (room && room.state === 'waiting_for_vote' && room.players[0].userId === data.userId) {
-            room.state = 'voting';
-            const playersToVoteFor = room.players.map(p => ({ userId: p.userId, name: p.name }));
-            io.to(data.roomCode).emit('votePhase', { players: playersToVoteFor, clues: room.clues });
-            broadcastSidebar(data.roomCode);
+        if (room && room.state === 'waiting_for_vote') {
+            if (!room.readyToVote.includes(data.userId)) {
+                room.readyToVote.push(data.userId);
+            }
+
+            const required = Math.floor(room.players.length / 2) + 1;
+
+            io.to(data.roomCode).emit('readyToVoteUpdate', {
+                readyCount: room.readyToVote.length,
+                total: room.players.length,
+                required: required
+            });
+
+            if (room.readyToVote.length >= required) {
+                room.state = 'voting';
+                const playersToVoteFor = room.players.map(p => ({ userId: p.userId, name: p.name }));
+                io.to(data.roomCode).emit('votePhase', { players: playersToVoteFor, clues: room.clues });
+                broadcastSidebar(data.roomCode);
+            }
         }
     });
 
@@ -276,7 +353,6 @@ io.on('connection', (socket) => {
             room.votes[data.userId] = data.votedId;
             broadcastSidebar(data.roomCode);
 
-            // Vérifier si tous les joueurs CONNECTÉS ont voté
             const connectedPlayers = room.players.filter(p => p.connected);
             const allVoted = connectedPlayers.every(p => room.votes[p.userId] !== undefined);
 
