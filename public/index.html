@@ -16,7 +16,7 @@
             --primary: #818cf8;
             --primary-hover: #6366f1;
             --success: #10b981;
-            --warning: #f59e0b;
+            --success-hover: #059669;
             --danger: #f43f5e;
             --border: rgba(45, 49, 66, 0.8);
         }
@@ -32,6 +32,7 @@
             background: linear-gradient(-45deg, #0f111a, #1a1b2e, #131b2f, #0f111a);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            user-select: none;
         }
 
         @keyframes gradientBG {
@@ -158,6 +159,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2em;
+            transition: 0.2s;
         }
 
         .chat-input-wrapper button:hover {
@@ -403,6 +405,18 @@
             border-top: 1px solid var(--border);
         }
 
+        .invite-alert {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: popIn 0.4s ease forwards;
+        }
+
+        /* --- SIDEBAR JOUEURS --- */
         .player-card {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -561,6 +575,7 @@
             border-color: var(--primary);
         }
 
+        /* --- MODAL AMÉLIORÉ --- */
         #custom-modal-overlay {
             position: fixed;
             top: 0;
@@ -579,11 +594,17 @@
             background: var(--bg-card);
             padding: 30px;
             border-radius: 16px;
-            max-width: 320px;
+            max-width: 350px;
             width: 90%;
             text-align: center;
             border: 1px solid var(--border);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
         }
 
         @keyframes popIn {
@@ -598,7 +619,6 @@
             }
         }
 
-        /* Cacher la scrollbar du chat pour que ce soit plus beau */
         .chat-messages::-webkit-scrollbar {
             width: 6px;
         }
@@ -614,10 +634,14 @@
 
     <div id="custom-modal-overlay">
         <div id="custom-modal">
-            <h2 id="custom-modal-title" style="border:none;">Info</h2>
-            <p id="custom-modal-msg" style="color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;">Message
-                ici</p>
-            <button class="btn-primary" onclick="closeModal()">Fermer</button>
+            <h2 id="custom-modal-title" style="border:none; margin-bottom: 10px;">Info</h2>
+            <p id="custom-modal-msg" style="color: var(--text-muted); line-height: 1.5; margin-bottom: 0;">Message ici
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="modal-cancel-btn" style="display:none;"
+                    onclick="closeModal(false)">Annuler</button>
+                <button class="btn-primary" id="modal-ok-btn" onclick="closeModal(true)">Fermer</button>
+            </div>
         </div>
     </div>
 
@@ -629,10 +653,9 @@
             </div>
 
             <div class="chat-container">
-                <div class="chat-messages" id="chat-messages">
-                </div>
+                <div class="chat-messages" id="chat-messages"></div>
                 <div class="chat-input-wrapper">
-                    <input type="text" id="chat-input" placeholder="Envoyer un message..."
+                    <input type="text" id="chat-input" placeholder="Discuter..."
                         onkeydown="if(event.key === 'Enter') sendChat()">
                     <button onclick="sendChat()">➤</button>
                 </div>
@@ -644,12 +667,18 @@
 
         <div class="main-content">
             <div id="menu" class="fade-in-up">
-                <h1 style="margin-bottom: 30px; font-size: 3em;">UNDERCOVER</h1>
+                <h1 style="margin-bottom: 30px; font-size: 2.8em;">UNDERCOVER</h1>
                 <p id="reconnect-msg"
                     style="color: var(--primary); font-weight: bold; text-align: center; display: none;">Tentative de
                     reconnexion...</p>
 
                 <div id="menu-content">
+                    <div id="invite-alert" class="invite-alert">
+                        <h3 style="color: var(--success); margin-bottom: 5px;">🎉 Invitation reçue !</h3>
+                        <p style="margin: 0; font-size: 0.9em;">Tu rejoins le salon <strong id="invite-code-display"
+                                style="color:white;"></strong>.<br>Choisis ton pseudo !</p>
+                    </div>
+
                     <div style="margin-bottom: 20px;">
                         <input type="text" id="globalPlayerName" placeholder="CHOISIS TON PSEUDO..." required
                             oninput="this.value = this.value.toUpperCase()"
@@ -657,7 +686,7 @@
                             style="text-align: center; font-size: 1.2em; padding: 18px;">
                     </div>
 
-                    <div class="join-block">
+                    <div class="join-block" id="join-block-container">
                         <h3 style="text-align: center; color: var(--primary); margin-bottom: 15px;">Rejoindre tes amis
                         </h3>
                         <input type="text" id="roomCodeInput" placeholder="CODE DU SALON" maxlength="4"
@@ -668,7 +697,7 @@
                             REJOINDRE LA PARTIE</button>
                     </div>
 
-                    <div class="create-block">
+                    <div class="create-block" id="create-block-container">
                         <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">Tu es le premier
                             arrivé ?</p>
                         <button onclick="createRoom()" class="btn-outline">Créer un nouveau salon</button>
@@ -678,8 +707,14 @@
 
             <div id="game-info" style="display: none;">
                 <h3 style="text-align: center; color: var(--text-muted);">CODE DU SALON</h3>
-                <h1 style="color: var(--primary); font-size: 4.5em; letter-spacing: 12px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(129, 140, 248, 0.4);"
+                <h1 style="color: var(--primary); font-size: 4.5em; letter-spacing: 12px; margin-bottom: 15px; text-shadow: 0 0 20px rgba(129, 140, 248, 0.4);"
                     id="room-display"></h1>
+
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <button onclick="copyInviteLink()" class="btn-outline"
+                        style="width: auto; padding: 10px 20px; font-size: 0.9em;">🔗 Copier le lien
+                        d'invitation</button>
+                </div>
 
                 <div id="settings-panel"
                     style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 30px;">
@@ -853,6 +888,7 @@
         }
         let savedRoomCode = localStorage.getItem('uc_room');
 
+        // --- SONS ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(freq, type, duration, vol = 0.1) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -866,6 +902,38 @@
         function playTick() { playTone(1000, 'square', 0.05, 0.05); }
         function playReveal() { playTone(150, 'sawtooth', 2.0, 0.3); playTone(200, 'sawtooth', 2.0, 0.3); }
 
+        // --- GESTION DU MODAL CUSTOM (REMPLACE ALERT ET CONFIRM) ---
+        let confirmCallback = null;
+        function showModal(title, message, isConfirm = false, onConfirm = null) {
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-msg').innerText = message;
+            document.getElementById('custom-modal-overlay').style.display = 'flex';
+
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const okBtn = document.getElementById('modal-ok-btn');
+
+            if (isConfirm) {
+                cancelBtn.style.display = 'block';
+                okBtn.innerText = 'Confirmer';
+                okBtn.classList.replace('btn-primary', 'btn-danger');
+                confirmCallback = onConfirm;
+            } else {
+                cancelBtn.style.display = 'none';
+                okBtn.innerText = 'Fermer';
+                okBtn.classList.replace('btn-danger', 'btn-primary');
+                confirmCallback = null;
+            }
+        }
+
+        function closeModal(isConfirmAction) {
+            document.getElementById('custom-modal-overlay').style.display = 'none';
+            if (isConfirmAction && confirmCallback) confirmCallback();
+        }
+
+        // --- GESTION DE L'URL (INVITATIONS) ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const invitedRoom = urlParams.get('room');
+
         socket.on('connect', () => {
             if (savedRoomCode) {
                 document.getElementById('menu-content').style.display = 'none';
@@ -874,8 +942,25 @@
             } else {
                 const savedName = localStorage.getItem('uc_name');
                 if (savedName) document.getElementById('globalPlayerName').value = savedName;
+
+                // Si on arrive via un lien d'invitation
+                if (invitedRoom) {
+                    document.getElementById('roomCodeInput').value = invitedRoom.toUpperCase();
+                    document.getElementById('invite-alert').style.display = 'block';
+                    document.getElementById('invite-code-display').innerText = invitedRoom.toUpperCase();
+                    document.getElementById('create-block-container').style.display = 'none'; // Cache la création
+                }
             }
         });
+
+        function copyInviteLink() {
+            const link = window.location.origin + window.location.pathname + "?room=" + savedRoomCode;
+            navigator.clipboard.writeText(link).then(() => {
+                showModal("Lien copié ! 🔗", "Envoie ce lien à tes amis. Ils rejoindront directement la partie en cliquant dessus !");
+            }).catch(err => {
+                showModal("Erreur", "Impossible de copier le lien. Donne-leur le code : " + savedRoomCode);
+            });
+        }
 
         // --- GESTION DU CHAT ---
         function sendChat() {
@@ -886,7 +971,6 @@
                 input.value = '';
             }
         }
-
         function appendChatMessage(msg) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
@@ -895,14 +979,12 @@
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
-
         socket.on('receiveMessage', (msg) => { appendChatMessage(msg); });
         socket.on('chatHistory', (messages) => {
             const container = document.getElementById('chat-messages');
             container.innerHTML = '';
             messages.forEach(appendChatMessage);
         });
-        // -----------------------
 
         function showBoard(boardId) {
             ['menu', 'game-info', 'game-board', 'vote-board', 'results-board'].forEach(id => {
@@ -915,13 +997,6 @@
             board.classList.add('fade-in-up');
             document.getElementById('sidebar').style.display = (boardId === 'menu') ? 'none' : 'flex';
         }
-
-        function showModal(title, message) {
-            document.getElementById('custom-modal-title').innerText = title;
-            document.getElementById('custom-modal-msg').innerText = message;
-            document.getElementById('custom-modal-overlay').style.display = 'flex';
-        }
-        function closeModal() { document.getElementById('custom-modal-overlay').style.display = 'none'; }
 
         let lastTick = -1;
         function startLocalTimer(endTime) {
@@ -970,12 +1045,15 @@
             socket.emit('joinRoom', { code: code, userId: localUserId, playerName: name });
         }
 
+        // --- REMPLACEMENT DU CONFIRM() PAR SHOWMODAL ---
         function leaveRoom() {
-            if (confirm("Veux-tu vraiment quitter le salon ?")) {
+            showModal("Quitter", "Veux-tu vraiment quitter ce salon ?", true, () => {
                 socket.emit('leaveRoom', { roomCode: savedRoomCode, userId: localUserId });
                 localStorage.removeItem('uc_room');
+                // Nettoie l'URL pour enlever le "?room=..."
+                window.history.replaceState({}, document.title, window.location.pathname);
                 location.reload();
-            }
+            });
         }
 
         function setTheme(theme) {

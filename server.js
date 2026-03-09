@@ -218,7 +218,6 @@ io.on('connection', (socket) => {
                     room: room,
                     myUserId: data.userId
                 });
-                // Envoi de l'historique du chat à la reconnexion
                 socket.emit('chatHistory', room.chat);
                 broadcastSidebar(data.roomCode);
                 return;
@@ -249,7 +248,7 @@ io.on('connection', (socket) => {
             votes: {},
             readyToVote: [],
             usedWords: [],
-            chat: [] // NOUVEAU: Historique du chat
+            chat: []
         };
 
         socket.join(roomCode);
@@ -269,14 +268,13 @@ io.on('connection', (socket) => {
             }
             socket.join(roomCode);
             socket.emit('roomJoined', { roomCode, settings: room.settings });
-            socket.emit('chatHistory', room.chat); // Envoi du chat aux nouveaux
+            socket.emit('chatHistory', room.chat);
             broadcastSidebar(roomCode);
         } else {
             socket.emit('error', 'Salon introuvable ou partie en cours.');
         }
     });
 
-    // --- NOUVEAU : GESTION DU CHAT ---
     socket.on('sendMessage', (data) => {
         const room = games[data.roomCode];
         if (room) {
@@ -284,7 +282,7 @@ io.on('connection', (socket) => {
             if (player) {
                 const msg = { sender: player.name, text: data.text };
                 room.chat.push(msg);
-                if (room.chat.length > 50) room.chat.shift(); // Garde les 50 derniers messages
+                if (room.chat.length > 50) room.chat.shift();
                 io.to(data.roomCode).emit('receiveMessage', msg);
             }
         }
